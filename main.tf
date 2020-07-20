@@ -176,8 +176,8 @@ resource "kubernetes_secret" "basic_auth_credentials" {
   }
 
   data = {
-    basic-auth-username     = "admin"
-    basic-auth-password     = random_password.basic_auth_password.result
+    basic-auth-username = "admin"
+    basic-auth-password = random_password.basic_auth_password.result
   }
 }
 
@@ -188,9 +188,9 @@ resource "kubernetes_secret" "basic_auth_credentials" {
 resource "null_resource" "change_password" {
   count = var.enable_sonarqube ? 1 : 0
 
-  depends_on    = [helm_release.sonar_qube]
+  depends_on = [helm_release.sonar_qube]
   provisioner "local-exec" {
-    command     = <<EOT
+    command = <<EOT
       curl -u admin:admin \
       -X POST "https://${local.hostname}/api/users/change_password?login=admin&previousPassword=admin&password=${local.basic_auth_password}"
 EOT
@@ -202,8 +202,8 @@ EOT
 ##########
 
 locals {
-  live_workspace = "manager"
-  live_domain    = "cloud-platform.service.justice.gov.uk"
+  live_workspace      = "manager"
+  live_domain         = "cloud-platform.service.justice.gov.uk"
   basic_auth_password = random_password.basic_auth_password.result
   hostname = terraform.workspace == local.live_workspace ? format("%s.%s", "sonarqube", local.live_domain) : format(
     "%s.%s",
