@@ -1,0 +1,98 @@
+# Default values for sonarqube.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+replicaCount: 1
+
+image:
+  repository: sonarqube
+  tag: ${sonarqube_image_tag}
+
+# Settings to configure elasticsearch host requirements
+elasticsearch:
+  configureNode: true
+  bootstrapChecks: true
+
+ingress:
+  enabled: true
+  # Used to create an Ingress record.
+  hosts:
+    - name: ${sonarqube_hostname}
+      # Different clouds or configurations might need /* as the default path
+      path: /
+  tls: 
+    - hosts:
+      - ${sonarqube_hostname}
+
+persistence:
+  enabled: true
+  ## Set annotations on pvc
+  annotations: {}
+
+  ## Specify an existing volume claim instead of creating a new one.
+  ## When using this option all following options like storageClass, accessMode and size are ignored.
+  # existingClaim:
+
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  storageClass: ${storage_class}
+  accessMode: ReadWriteOnce
+  size: 10Gi
+
+
+# List of plugins to install.
+# For example:
+# plugins:
+#  install:
+#    - "https://github.com/AmadeusITGroup/sonar-stash/releases/download/1.3.0/sonar-stash-plugin-1.3.0.jar"
+#    - "https://github.com/SonarSource/sonar-ldap/releases/download/2.2-RC3/sonar-ldap-plugin-2.2.0.601.jar"
+plugins:
+  install: 
+    - "https://github.com/vaulttec/sonar-auth-oidc/releases/download/v${oidc_plugin_version}/sonar-auth-oidc-plugin-${oidc_plugin_version}.jar"
+  lib: []
+
+# A custom sonar.properties file can be provided via dictionary.
+# For example:
+sonarProperties:
+  sonar.core.serverBaseURL: https://${sonarqube_hostname}
+  sonar.auth.oidc.enabled: true
+  sonar.auth.oidc.issuerUri: ${issuer_url}
+  sonar.auth.oidc.clientId.secured: ${client_id}
+  sonar.auth.oidc.loginStrategy: Email
+  sonar.forceAuthentication: true
+
+# Additional sonar properties to load from a secret with a key "secret.properties" (must be a string)
+sonarSecretProperties: "auth0-credentials"
+
+## JDBC Database Type; by default postgresql. To use a different Database type, adjust
+jdbcDatabaseType: postgresql
+
+## Override JDBC URL
+# jdbcUrlOverride: "jdbc:postgresql://myPostgress/myDatabase;socketTimeout=1500"
+
+## Configuration values for postgresql dependency
+## ref: https://github.com/kubernetes/charts/blob/master/stable/postgresql/README.md
+postgresql:
+  # Enable to deploy the PostgreSQL chart
+  enabled: false
+  # To use an external PostgreSQL instance, set enabled to false and uncomment
+  # the line below:
+  postgresqlServer: ${postgresql_host}
+  # To use an external secret for the password for an external PostgreSQL
+  # instance, set enabled to false and provide the name of the secret on the
+  # line below:
+  existingSecret: "postgresql-credentials"
+  postgresqlUsername: ${postgresql_user}
+  postgresqlDatabase: ${postgresql_name}
+  # Specify the TCP port that PostgreSQL should use
+  service:
+    port: 5432
+
+serviceAccount:
+  create: true
+  # name:
+  ## Annotations for the Service Account
+  annotations: {}
