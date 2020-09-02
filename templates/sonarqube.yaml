@@ -23,26 +23,6 @@ ingress:
     - hosts:
       - ${sonarqube_hostname}
 
-persistence:
-  enabled: true
-  ## Set annotations on pvc
-  annotations: {}
-
-  ## Specify an existing volume claim instead of creating a new one.
-  ## When using this option all following options like storageClass, accessMode and size are ignored.
-  # existingClaim:
-
-  ## If defined, storageClassName: <storageClass>
-  ## If set to "-", storageClassName: "", which disables dynamic provisioning
-  ## If undefined (the default) or set to null, no storageClassName spec is
-  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
-  ##   GKE, AWS & OpenStack)
-  ##
-  storageClass: ${storage_class}
-  accessMode: ReadWriteOnce
-  size: 10Gi
-
-
 # List of plugins to install.
 # For example:
 # plugins:
