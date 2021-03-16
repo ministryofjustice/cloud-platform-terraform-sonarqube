@@ -91,17 +91,11 @@ resource "aws_db_instance" "sonarqube" {
 # sonarqube helm #
 ##################
 
-data "helm_repository" "oteemocharts" {
-
-  name = "oteemocharts"
-  url  = "https://oteemo.github.io/charts"
-}
-
 resource "helm_release" "sonar_qube" {
   count = var.enable_sonarqube ? 1 : 0
 
   name       = "sonarqube"
-  repository = data.helm_repository.oteemocharts.metadata[0].name
+  repository = "https://oteemo.github.io/charts"
   chart      = "sonarqube"
   namespace  = kubernetes_namespace.sonarqube[count.index].id
   version    = var.sonarqube_chart_version
