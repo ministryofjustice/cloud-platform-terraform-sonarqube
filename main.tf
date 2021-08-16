@@ -73,18 +73,20 @@ resource "random_password" "db_password" {
 resource "aws_db_instance" "sonarqube" {
   count = var.enable_sonarqube ? 1 : 0
 
-  depends_on             = [aws_security_group.sonarqube]
-  identifier             = "${terraform.workspace}-sonarqube"
-  allocated_storage      = var.rds_storage
-  engine                 = "postgres"
-  engine_version         = var.rds_postgresql_version
-  instance_class         = var.rds_instance_class
-  name                   = "sonarqube"
-  username               = "sonarqube"
-  password               = random_password.db_password[count.index].result
-  vpc_security_group_ids = [aws_security_group.sonarqube[count.index].id]
-  db_subnet_group_name   = aws_db_subnet_group.sonarqube[count.index].id
-  skip_final_snapshot    = true
+  depends_on                  = [aws_security_group.sonarqube]
+  identifier                  = "${terraform.workspace}-sonarqube"
+  allocated_storage           = var.rds_storage
+  engine                      = "postgres"
+  engine_version              = var.rds_postgresql_version
+  instance_class              = var.rds_instance_class
+  name                        = "sonarqube"
+  username                    = "sonarqube"
+  password                    = random_password.db_password[count.index].result
+  vpc_security_group_ids      = [aws_security_group.sonarqube[count.index].id]
+  db_subnet_group_name        = aws_db_subnet_group.sonarqube[count.index].id
+  skip_final_snapshot         = true
+  auto_minor_version_upgrade  = var.allow_minor_version_upgrade
+  allow_major_version_upgrade = var.allow_major_version_upgrade
 }
 
 ##################
